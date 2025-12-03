@@ -1,0 +1,26 @@
+<annotation>
+	<folder>car_number_plate_dataset</folder>
+	<filename>64.jpg</filename>
+	<path>/Users/nahiyanalamgir/code/number_plate_detector/car_number_plate_dataset/64.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>480</width>
+		<height>360</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>registration_plate</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>204</xmin>
+			<ymin>251</ymin>
+			<xmax>287</xmax>
+			<ymax>291</ymax>
+		</bndbox>
+	</object>
+</annotation>

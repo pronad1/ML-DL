@@ -1,0 +1,26 @@
+<annotation>
+	<folder>train</folder>
+	<filename>327.jpg</filename>
+	<path>/Users/nahiyanalamgir/code/number_plate_detector/car_number_plate_dataset/train/327.jpg</path>
+	<source>
+		<database>Unknown</database>
+	</source>
+	<size>
+		<width>960</width>
+		<height>720</height>
+		<depth>3</depth>
+	</size>
+	<segmented>0</segmented>
+	<object>
+		<name>registration_plate</name>
+		<pose>Unspecified</pose>
+		<truncated>0</truncated>
+		<difficult>0</difficult>
+		<bndbox>
+			<xmin>416</xmin>
+			<ymin>251</ymin>
+			<xmax>618</xmax>
+			<ymax>343</ymax>
+		</bndbox>
+	</object>
+</annotation>
