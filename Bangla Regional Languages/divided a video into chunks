@@ -1,0 +1,133 @@
+import os
+import glob
+import subprocess
+import tempfile
+from pydub import AudioSegment
+from pydub.silence import split_on_silence
+
+
+# -----------------------------
+# Auto-detect FFmpeg (winget/manual safe)
+# -----------------------------
+def find_ffmpeg_exe() -> str:
+    candidates = [
+        r"C:\ffmpeg\bin\ffmpeg.exe",
+        r"C:\Program Files\ffmpeg\bin\ffmpeg.exe",
+    ]
+
+    for c in candidates:
+        if os.path.isfile(c):
+            return c
+
+    # Search inside winget packages
+    winget_root = os.path.expandvars(r"%LOCALAPPDATA%\Microsoft\WinGet\Packages")
+    hits = glob.glob(os.path.join(winget_root, "Gyan.FFmpeg_*", "**", "ffmpeg.exe"), recursive=True)
+    if hits:
+        return hits[0]
+
+    raise FileNotFoundError("❌ ffmpeg.exe পাওয়া যায়নি।")
+
+
+# -----------------------------
+# Convert any audio -> WAV (16k mono)
+# (This avoids ffprobe completely)
+# -----------------------------
+def convert_to_wav_16k_mono(ffmpeg_path: str, input_path: str) -> str:
+    input_path = os.path.abspath(input_path)
+
+    if not os.path.isfile(input_path):
+        raise FileNotFoundError(f"❌ Input file not found: {input_path}")
+
+    # temp wav output
+    tmp_dir = tempfile.mkdtemp(prefix="audio_split_")
+    out_wav = os.path.join(tmp_dir, "converted.wav")
+
+    cmd = [
+        ffmpeg_path,
+        "-y",
+        "-i", input_path,
+        "-ar", "16000",     # 16 kHz
+        "-ac", "1",         # mono
+        "-vn",
+        out_wav
+    ]
+
+    # Run ffmpeg
+    res = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+
+    if res.returncode != 0 or not os.path.isfile(out_wav):
+        print("------ FFmpeg STDERR ------")
+        print(res.stderr[:2000])
+        print("---------------------------")
+        raise RuntimeError("❌ FFmpeg conversion failed. (See stderr above)")
+
+    return out_wav
+
+
+# -----------------------------
+# Split WAV into sentence-like chunks
+# -----------------------------
+def split_wav_to_sentence_like_chunks(
+    wav_path: str,
+    original_name: str,
+    out_dir: str = "chunks",
+    min_silence_len: int = 500,   # ms
+    silence_thresh_db: int = 16,  # audio.dBFS - this
+    keep_silence: int = 200,      # ms
+    min_chunk_ms: int = 800,      # discard too short chunks
+    out_format: str = "wav"
+):
+    os.makedirs(out_dir, exist_ok=True)
+
+    # ✅ from_wav() uses no ffprobe
+    audio = AudioSegment.from_wav(wav_path)
+
+    silence_thresh = audio.dBFS - silence_thresh_db
+
+    chunks = split_on_silence(
+        audio,
+        min_silence_len=min_silence_len,
+        silence_thresh=silence_thresh,
+        keep_silence=keep_silence,
+    )
+
+    chunks = [c for c in chunks if len(c) >= min_chunk_ms]
+
+    if not chunks:
+        print("⚠️ কোনো chunk পাওয়া যায়নি। parameters adjust করো।")
+        return
+
+    for i, chunk in enumerate(chunks, 1):
+        out_path = os.path.join(out_dir, f"{original_name}_sentence_{i:04d}.{out_format}")
+        chunk.export(out_path, format=out_format)
+
+    print(f"🎉 Done! Total chunks: {len(chunks)}")
+    print(f"📁 Saved in: {os.path.abspath(out_dir)}")
+
+
+# -----------------------------
+# MAIN
+# -----------------------------
+if name == "main":
+    # ✅ তোমার ফাইলের path এখানে দাও (raw string best)
+    INPUT_PATH = r"G:\bangla regional language\New folder\8.mp4"
+
+    ffmpeg = find_ffmpeg_exe()
+    print("✅ Using ffmpeg:", ffmpeg)
+
+    # 1) Convert to clean WAV (16k mono)
+    converted_wav = convert_to_wav_16k_mono(ffmpeg, INPUT_PATH)
+    print("✅ Converted WAV:", converted_wav)
+
+    # 2) Split
+    base_name = os.path.splitext(os.path.basename(INPUT_PATH))[0]
+    split_wav_to_sentence_like_chunks(
+        wav_path=converted_wav,
+        original_name=base_name,
+        out_dir="chunks",
+        min_silence_len=500,
+        silence_thresh_db=16,
+        keep_silence=200,
+        min_chunk_ms=800,
+        out_format="wav"
+    )
