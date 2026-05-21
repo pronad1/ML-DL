@@ -1,3 +1,1 @@
 ### Learning ...
-
-Let's start,,,
