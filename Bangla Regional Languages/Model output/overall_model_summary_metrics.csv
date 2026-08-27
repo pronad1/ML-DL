@@ -1,0 +1,10 @@
+Metric Category,Performance Metric,Value
+Dialect Identification (DID),Overall Accuracy,91.64%
+Dialect Identification (DID),Macro F1-Score,87.24%
+Dialect Identification (DID),Weighted F1-Score,91.27%
+Dialect Identification (DID),Macro Precision,89.87%
+Dialect Identification (DID),Macro Recall,86.75%
+Speech Recognition (ASR),Word Error Rate (WER),84.15%
+Speech Recognition (ASR),Character Error Rate (CER),65.56%
+Computational Efficiency,Inference Latency / Sample,218.6 ms
+Computational Efficiency,Trainable Parameters,37.91 M
