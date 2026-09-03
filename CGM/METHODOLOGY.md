@@ -47,7 +47,7 @@ By extending the forward-looking window to T+115 min with **horizon-specific fea
 
 | Horizon | Forward-looking window | Gap to predict | DTS A-Zone |
 |---|---|---|---|
-| 30-min | T+5 to T+25 (steps 1–5) | 5 min | **99.9%** ✅ |
+| 30-min | T+5 to T+25 (steps 1–5) | 5 min | **99.8%** ✅ |
 | 60-min | T+5 to T+55 (steps 1–11) | 5 min | **99.9%** ✅ |
 | 90-min | T+5 to T+85 (steps 1–17) | 5 min | **99.9%** ✅ |
 | 120-min | T+5 to T+115 (steps 1–23) | 5 min | **99.9%** ✅ |
