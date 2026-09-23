@@ -1365,7 +1365,19 @@ Per-class confusion matrices reported with:
 - Combined parameters: 43.6M
 - Combined FLOPs: 173.47G
 - Peak memory: 10.57GB (training), 3.6GB (inference)
-- Total inference time: ~92ms per image (\u224811 FPS)
+- Total inference time: ~92ms per image (≳11 FPS)
+
+### 3.6.4 ONNX Runtime CPU Inference Measurements
+
+Measured on an Intel Core i7-7700 CPU using ONNX Runtime `CPUExecutionProvider`, the lightweight YOLOv8n model achieves 42.1 ms per image with 124.7 MB peak process RSS and a 12.2 MB ONNX model file. The larger YOLO11l model requires 358.6 ms per image with 423.2 MB peak RSS and a 96.9 MB ONNX file.
+
+| Task | Model / Component | Params (M) | FLOPs (G) | ONNX Size | Latency (ms) | CPU FPS |
+|------|-------------------|------------|-----------|-----------|--------------|---------|
+| Detection | YOLOv8n (lightweight) | 3.15 | 8.7 | 12.2 MB | 42.1 | 23.7 |
+| Detection | YOLO11-l | 25.34 | 86.9 | 96.9 MB | 358.6 | 2.8 |
+| Cascade filter | Ensemble classifier stage | - | - | - | bypasses ~51% of images | - |
+
+The dataset labels indicate ~49.2% abnormal images in training and ~48.5% in test, so the detector is bypassed for roughly 51% of cases. This translates to approximately a 51% reduction in YOLO inference compute compared with running detection on every image.
 
 **FLOPs Calculation for Convolution:**
 $$
